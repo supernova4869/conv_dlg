@@ -18,6 +18,6 @@ fn main() {
         com.push(PdbqtModel::new(lig.model_id, &r_atoms));
     }
     let com_pdbqt = PDBQT::new(&com);
-    com_pdbqt.to_file("complex.pdbqt");
-    println!("Finished writing to complex.pdbqt");
+    com_pdbqt.to_file("complex");
+    println!("Finished writing to complex_confx.pdbqt");
 }
