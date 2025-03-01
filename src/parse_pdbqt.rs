@@ -54,14 +54,12 @@ impl PDBQT {
         }
     }
 
-    pub fn to_file(&self, fname: &str) {
-        let mut file = File::create(fname).unwrap();
+    pub fn to_file(&self, fstem: &str) {
         for m in &self.models {
-            writeln!(file, "MODEL       {:2}", m.model_id).unwrap();
+            let mut file = File::create(format!("{}_conf{}.pdbqt", fstem, m.model_id)).unwrap();
             for a in &m.atoms {
                 writeln!(file, "{}", a).unwrap();
             }
-            writeln!(file, "ENDNDL").unwrap();
         }
     }
 }
@@ -149,7 +147,7 @@ impl fmt::Display for PdbqtAtom {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         // 01234567890123456789012345678901234567890123456789012345678901234567890123456789
         // ATOM      1  N   ALA A   2      26.338 -25.338  11.581  1.00 42.62     0.614 N 
-        write!(f, "{:6} {:4} {:4} {:3} {:1}{:4}    {:8.3}{:8.3}{:8.3}  {:4.2}{:6.2}    {:6.3} {:2}",
+        write!(f, "{:6} {:4} {:4} {:3} {:1}{:4}    {:8.3}{:8.3}{:8.3}{:6.2}{:6.2}    {:6.3} {:2}",
         self.typ, self.atid, self.atname, self.resname, self.chainname, self.resid, self.x, self.y, self.z, self.occupy, self.bf, self.charge, self.attype
     )
 }
