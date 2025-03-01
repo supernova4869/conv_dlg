@@ -61,6 +61,7 @@ impl PDBQT {
             for a in &m.atoms {
                 writeln!(file, "{}", a).unwrap();
             }
+            writeln!(file, "ENDNDL").unwrap();
         }
     }
 }
