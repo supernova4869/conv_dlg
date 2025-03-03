@@ -5,12 +5,12 @@ use parse_pdbqt::{PdbqtModel, PDBQT};
 
 fn main() {
     let args: Vec<String> = args().collect();
-    if args.len() == 1 {
-        println!("Usage: conv_dlg [rec].dlg [lig].dlg");
+    if args.len() <= 2 {
+        println!("Usage: conv_dlg [lig].dlg [rec].pdbqt");
         exit(0);
     }
-    let rec = PDBQT::from(&args[1]);
-    let mut lig = PDBQT::from_dlg(&args[2]);
+    let rec = PDBQT::from(&args[2]);
+    let mut lig = PDBQT::from_dlg(&args[1]);
     let mut com: Vec<PdbqtModel> = vec![];
     for lig in &mut lig.models {
         let mut r_atoms = rec.models[0].atoms.clone();
