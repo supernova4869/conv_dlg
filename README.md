@@ -2,4 +2,4 @@
 
 Usage: conv_dlg [rec].pdbqt [lig].pdbqt
 
-Output: complex.pdbqt
+Output: complex_conf0.pdbqt complex_conf1.pdbqt ...
