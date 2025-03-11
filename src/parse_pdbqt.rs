@@ -54,7 +54,18 @@ impl PDBQT {
         }
     }
 
-    pub fn to_file(&self, fstem: &str) {
+    pub fn write(&self, fname: &str) {
+        let mut file = File::create(fname).unwrap();
+        for m in &self.models {
+            writeln!(file, "MODEL {}", m.model_id).unwrap();
+            for a in &m.atoms {
+                writeln!(file, "{}", a).unwrap();
+            }
+            writeln!(file, "ENDMDL").unwrap();
+        }
+    }
+
+    pub fn split(&self, fstem: &str) {
         for m in &self.models {
             let mut file = File::create(format!("{}_conf{}.pdbqt", fstem, m.model_id)).unwrap();
             for a in &m.atoms {
