@@ -1,6 +1,9 @@
 ## For AutoDock-GPU output file conversion (dlg -> pdbqt).
 
-Usage 1: conv_dlg [lig].dlg
-Usage 1: conv_dlg [lig].dlg [rec].pdbqt
+Usage: conv_dlg --help
 
-Output: \[rec\]\_\[lig\]\_conf0.pdbqt \[rec\]\_\[lig\]\_conf1.pdbqt ...
+Parameters:
+- -d: Docking results (dlg)
+- -r: Receptor (pdbqt)
+- -t: Output total or split ("y" for total, "n" for split, when rec.pdbqt provided)
+- -o: Output pdbqt or pdb (default pdbqt)

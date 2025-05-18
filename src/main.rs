@@ -1,26 +1,45 @@
 mod parse_pdbqt;
-use std::{env::args, process::exit};
+use std::path::Path;
 
 use parse_pdbqt::{PdbqtModel, PDBQT};
+use clap::Parser;
+
+/// Convert docking results (dlg) of AutoDock-GPU
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+    /// Name of the docking results (dlg)
+    #[arg(short, long)]
+    dlg: String,
+
+    /// Name of the receptor file (pdbqt)
+    #[arg(short, long, default_value_t = String::new())]
+    rec: String,
+
+    /// Output total or split
+    #[arg(short, long, default_value_t = true)]
+    total: bool,
+
+    /// Output type: pdbqt or pdb
+    #[arg(short, long, default_value_t = String::from("pdbqt"))]
+    out: String,
+}
 
 fn main() {
-    let args: Vec<String> = args().collect();
-    if args.len() <= 1 {
-        println!("Usage 1: conv_dlg [lig].dlg");
-        println!("Usage 2: conv_dlg [lig].dlg [rec].pdbqt");
-        exit(0);
-    } else if args.len() == 2 {
-        let lig = PDBQT::from_dlg(&args[1]);
+    let args = Args::parse();
+
+    if args.rec.is_empty() {
+        let lig = PDBQT::from_dlg(&args.dlg);
         let mut ligs: Vec<PdbqtModel> = vec![];
         for lig in &lig.models {
             ligs.push(PdbqtModel::new(lig.model_id, &lig.atoms));
         }
         let ligs_pdbqt = PDBQT::new(&ligs);
-        ligs_pdbqt.write(format!("{}_out.pdbqt", &args[1][..&args[1].len() - 4]).as_str());
+        ligs_pdbqt.write(format!("{}_out.pdbqt", &args.dlg[..&args.dlg.len() - 4]).as_str(), &args.out);
         println!("Finished writing to [lig]_out.pdbqt");
     } else {
-        let rec = PDBQT::from(&args[2]);
-        let mut lig = PDBQT::from_dlg(&args[1]);
+        let rec = PDBQT::from(&args.rec);
+        let mut lig = PDBQT::from_dlg(&args.dlg);
         let mut com: Vec<PdbqtModel> = vec![];
         for lig in &mut lig.models {
             let mut r_atoms = rec.models[0].atoms.clone();
@@ -28,7 +47,18 @@ fn main() {
             com.push(PdbqtModel::new(lig.model_id, &r_atoms));
         }
         let com_pdbqt = PDBQT::new(&com);
-        com_pdbqt.split(format!("{}_{}", &args[2][..&args[2].len() - 6], &args[1][..&args[1].len() - 4]).as_str());
-        println!("Finished writing to [rec]_[lig]_conf[id].pdbqt");
+        let dlg_stem = Path::new(&args.dlg).file_stem().unwrap().to_str().unwrap();
+        let rec_stem = Path::new(&args.rec).file_stem().unwrap().to_str().unwrap();
+        if args.total {
+            let fname = Path::new(&args.rec).parent().unwrap().join(format!("{}_{}.{}", rec_stem, dlg_stem, &args.out));
+            let fname = fname.to_str().unwrap();
+            com_pdbqt.write(fname, &args.out);
+            println!("Finished writing to {}", fname);
+        } else {
+            let fname = Path::new(&args.rec).parent().unwrap().join(format!("{}_{}", rec_stem, dlg_stem));
+            let fname = fname.to_str().unwrap();
+            com_pdbqt.split(fname, &args.out);
+            println!("Finished writing to {}", fname);
+        }
     }
 }

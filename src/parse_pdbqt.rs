@@ -54,22 +54,30 @@ impl PDBQT {
         }
     }
 
-    pub fn write(&self, fname: &str) {
+    pub fn write(&self, fname: &str, out_type: &str) {
         let mut file = File::create(fname).unwrap();
         for m in &self.models {
             writeln!(file, "MODEL {}", m.model_id).unwrap();
             for a in &m.atoms {
-                writeln!(file, "{}", a).unwrap();
+                if out_type.eq("pdbqt") {
+                    writeln!(file, "{}", a).unwrap();
+                } else {
+                    writeln!(file, "{:-}", a).unwrap();
+                }
             }
             writeln!(file, "ENDMDL").unwrap();
         }
     }
 
-    pub fn split(&self, fstem: &str) {
+    pub fn split(&self, fname: &str, out_type: &str) {
         for m in &self.models {
-            let mut file = File::create(format!("{}_conf{}.pdbqt", fstem, m.model_id)).unwrap();
+            let mut file = File::create(&format!("{}_conf{}.pdbqt", fname, m.model_id)).unwrap();
             for a in &m.atoms {
-                writeln!(file, "{}", a).unwrap();
+                if out_type.eq("pdbqt") {
+                    writeln!(file, "{}", a).unwrap();
+                } else {
+                    writeln!(file, "{:-}", a).unwrap();
+                }
             }
         }
     }
@@ -158,8 +166,16 @@ impl fmt::Display for PdbqtAtom {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         // 01234567890123456789012345678901234567890123456789012345678901234567890123456789
         // ATOM      1  N   ALA A   2      26.338 -25.338  11.581  1.00 42.62     0.614 N 
-        write!(f, "{:6} {:4} {:4} {:3} {:1}{:4}    {:8.3}{:8.3}{:8.3}{:6.2}{:6.2}    {:6.3} {:2}",
-        self.typ, self.atid, self.atname, self.resname, self.chainname, self.resid, self.x, self.y, self.z, self.occupy, self.bf, self.charge, self.attype
-    )
-}
+        if f.sign_minus() {
+            // Write pdb
+            write!(f, "{:6} {:4} {:4} {:3} {:1}{:4}    {:8.3}{:8.3}{:8.3}{:6.2}{:6.2}           {:2}",
+                self.typ, self.atid, self.atname, self.resname, self.chainname, self.resid, self.x, self.y, self.z, self.occupy, self.bf, self.atname[0..1].to_string()
+            )
+        } else {
+            // Write pdbqt
+            write!(f, "{:6} {:4} {:4} {:3} {:1}{:4}    {:8.3}{:8.3}{:8.3}{:6.2}{:6.2}    {:6.3} {:2}",
+                self.typ, self.atid, self.atname, self.resname, self.chainname, self.resid, self.x, self.y, self.z, self.occupy, self.bf, self.charge, self.attype
+            )
+        }
+    }
 }
