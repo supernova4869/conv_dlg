@@ -16,9 +16,9 @@ struct Args {
     #[arg(short, long, default_value_t = String::new())]
     rec: String,
 
-    /// Output total or split
-    #[arg(short, long, default_value_t = true)]
-    total: bool,
+    /// Output totally or not (splitted by model)
+    #[arg(short, long, default_value_t = String::from("y"))]
+    total: String,
 
     /// Output type: pdbqt or pdb
     #[arg(short, long, default_value_t = String::from("pdbqt"))]
@@ -49,7 +49,7 @@ fn main() {
         let com_pdbqt = PDBQT::new(&com);
         let dlg_stem = Path::new(&args.dlg).file_stem().unwrap().to_str().unwrap();
         let rec_stem = Path::new(&args.rec).file_stem().unwrap().to_str().unwrap();
-        if args.total {
+        if args.total.eq("y") {
             let fname = Path::new(&args.rec).parent().unwrap().join(format!("{}_{}.{}", rec_stem, dlg_stem, &args.out));
             let fname = fname.to_str().unwrap();
             com_pdbqt.write(fname, &args.out);
@@ -58,7 +58,7 @@ fn main() {
             let fname = Path::new(&args.rec).parent().unwrap().join(format!("{}_{}", rec_stem, dlg_stem));
             let fname = fname.to_str().unwrap();
             com_pdbqt.split(fname, &args.out);
-            println!("Finished writing to {}", fname);
+            println!("Finished writing to {}_conf[id].{}", fname, &args.out);
         }
     }
 }

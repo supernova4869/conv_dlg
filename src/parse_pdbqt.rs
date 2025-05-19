@@ -57,6 +57,7 @@ impl PDBQT {
     pub fn write(&self, fname: &str, out_type: &str) {
         let mut file = File::create(fname).unwrap();
         for m in &self.models {
+            println!("Writing MODEL {}...", m.model_id);
             writeln!(file, "MODEL {}", m.model_id).unwrap();
             for a in &m.atoms {
                 if out_type.eq("pdbqt") {
@@ -71,7 +72,8 @@ impl PDBQT {
 
     pub fn split(&self, fname: &str, out_type: &str) {
         for m in &self.models {
-            let mut file = File::create(&format!("{}_conf{}.pdbqt", fname, m.model_id)).unwrap();
+            println!("Writing MODEL {}...", m.model_id);
+            let mut file = File::create(&format!("{}_conf{}.{}", fname, m.model_id, out_type)).unwrap();
             for a in &m.atoms {
                 if out_type.eq("pdbqt") {
                     writeln!(file, "{}", a).unwrap();
