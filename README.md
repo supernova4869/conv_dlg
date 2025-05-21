@@ -5,5 +5,5 @@ Usage: conv_dlg --help
 Parameters:
 - -d: Docking results (dlg)
 - -r: Receptor (pdbqt)
-- -t: Output total or split ("y" for total, "n" for split, when rec.pdbqt provided)
-- -o: Output pdbqt or pdb (default pdbqt)
+- -s: Output split or total ("y" for split, "n" for totally, when rec.pdbqt provided)
+- -f: Output format: pdbqt or pdb (default pdbqt)

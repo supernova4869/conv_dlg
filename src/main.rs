@@ -16,13 +16,13 @@ struct Args {
     #[arg(short, long, default_value_t = String::new())]
     rec: String,
 
-    /// Output totally or not (splitted by model)
+    /// Output splitted by model or totally
     #[arg(short, long, default_value_t = String::from("y"))]
-    total: String,
+    split: String,
 
     /// Output type: pdbqt or pdb
     #[arg(short, long, default_value_t = String::from("pdbqt"))]
-    out: String,
+    format: String,
 }
 
 fn main() {
@@ -35,7 +35,7 @@ fn main() {
             ligs.push(PdbqtModel::new(lig.model_id, &lig.atoms));
         }
         let ligs_pdbqt = PDBQT::new(&ligs);
-        ligs_pdbqt.write(format!("{}_out.pdbqt", &args.dlg[..&args.dlg.len() - 4]).as_str(), &args.out);
+        ligs_pdbqt.write(format!("{}_out.pdbqt", &args.dlg[..&args.dlg.len() - 4]).as_str(), &args.format);
         println!("Finished writing to [lig]_out.pdbqt");
     } else {
         let rec = PDBQT::from(&args.rec);
@@ -49,16 +49,16 @@ fn main() {
         let com_pdbqt = PDBQT::new(&com);
         let dlg_stem = Path::new(&args.dlg).file_stem().unwrap().to_str().unwrap();
         let rec_stem = Path::new(&args.rec).file_stem().unwrap().to_str().unwrap();
-        if args.total.eq("y") {
-            let fname = Path::new(&args.rec).parent().unwrap().join(format!("{}_{}.{}", rec_stem, dlg_stem, &args.out));
+        if args.split.eq("y") {
+            let fname = Path::new(&args.rec).parent().unwrap().join(format!("{}_{}.{}", rec_stem, dlg_stem, &args.format));
             let fname = fname.to_str().unwrap();
-            com_pdbqt.write(fname, &args.out);
+            com_pdbqt.write(fname, &args.format);
             println!("Finished writing to {}", fname);
         } else {
             let fname = Path::new(&args.rec).parent().unwrap().join(format!("{}_{}", rec_stem, dlg_stem));
             let fname = fname.to_str().unwrap();
-            com_pdbqt.split(fname, &args.out);
-            println!("Finished writing to {}_conf[id].{}", fname, &args.out);
+            com_pdbqt.split(fname, &args.format);
+            println!("Finished writing to {}_conf[id].{}", fname, &args.format);
         }
     }
 }
